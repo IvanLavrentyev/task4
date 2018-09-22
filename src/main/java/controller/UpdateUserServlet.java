@@ -1,0 +1,44 @@
+package controller;
+
+import model.User;
+import service.UserService;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet (urlPatterns = "/updateUser")
+public class UpdateUserServlet extends HttpServlet {
+
+    private final UserService userService = new UserService();
+    private static long id;
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        id = Long.parseLong(req.getParameter("id"));
+        User user = userService.getUserById(id);
+
+        req.setAttribute("user", user);
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/updateUser.jsp");
+        requestDispatcher.forward(req,resp);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String name = req.getParameter("newName");
+        String login = req.getParameter("newLogin");
+        String password = req.getParameter("newPassword");
+        String role = req.getParameter("newRole");
+
+        if (role.equalsIgnoreCase("admin") || role.equalsIgnoreCase("user")){
+            userService.updateUser(id, name, login, password,role);
+        }
+
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/allUsers");
+        requestDispatcher.forward(req,resp);
+    }
+}
